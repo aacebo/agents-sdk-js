@@ -11,31 +11,31 @@ const argv = yargs(hideBin(process.argv))
   .option('port', {
     type: 'number',
     describe: 'which port to run on',
-    default: 3000
+    default: 3000,
   })
   .option('name', {
     type: 'string',
     describe: 'the agents name',
-    demandOption: true
+    demandOption: true,
   })
   .option('prompt', {
     type: 'string',
     describe: 'the agents prompt',
-    demandOption: true
+    demandOption: true,
   })
   .option('model', {
     type: 'string',
     describe: 'the LLM model to use',
-    demandOption: true
+    demandOption: true,
   })
   .option('api-key', {
     type: 'string',
     describe: 'the API key to use for the LLM',
-    demandOption: true
+    demandOption: true,
   })
   .option('parent', {
     type: 'string',
-    describe: 'the parent agents url to connect to'
+    describe: 'the parent agents url to connect to',
   })
   .parseSync();
 

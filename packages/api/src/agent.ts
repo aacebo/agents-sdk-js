@@ -20,7 +20,7 @@ export class Agent {
   private readonly _server: http.Server;
   private readonly _agentsServer: io.Server;
   private readonly _clientsServer: io.Server;
-  private readonly _sockets: Record<string, io.Socket> = { };
+  private readonly _sockets: Record<string, io.Socket> = {};
 
   constructor(readonly options: AgentOptions) {
     const app = express();
@@ -33,7 +33,7 @@ export class Agent {
         prompt: options.prompt,
         model: options.model,
         parent: options.parent,
-        sockets: Object.keys(this._sockets)
+        sockets: Object.keys(this._sockets),
       });
     });
 
@@ -42,12 +42,12 @@ export class Agent {
     this.log.enabled = true;
     this._agentsServer = new io.Server(this._server, {
       cors: { origin: '*' },
-      path: '/agents'
+      path: '/agents',
     });
 
     this._clientsServer = new io.Server(this._server, {
       cors: { origin: '*' },
-      path: '/clients'
+      path: '/clients',
     });
 
     this._agentsServer.on('connection', this._onAgentConnect.bind(this));
@@ -57,7 +57,7 @@ export class Agent {
       this._parent = ioClient(options.parent, {
         auth: { name: options.name },
         autoConnect: false,
-        path: '/agents'
+        path: '/agents',
       });
 
       this._parent.on('connect', this._onParentConnect.bind(this));
@@ -75,8 +75,7 @@ export class Agent {
     this.log(`${name} connected...`);
   }
 
-  private _onClientConnect(_: io.Socket) {
-  }
+  private _onClientConnect(_: io.Socket) {}
 
   private _onParentConnect() {
     this.log('connected to parent...');
