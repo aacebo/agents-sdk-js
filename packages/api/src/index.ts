@@ -44,11 +44,10 @@ const argv = yargs(hideBin(process.argv))
   })
   .parseSync();
 
+const sockets: Array<string> = [];
 const app = express();
 const log = debug(`agents/${argv.name}`);
 log.enabled = true;
-
-const sockets: Array<string> = [];
 
 app.use(express.json());
 app.use(cors());
@@ -64,7 +63,8 @@ app.get('/', (_, res) => {
 
 const server = http.createServer(app);
 const io = new socket.Server(server, {
-  cors: { origin: '*' }
+  cors: { origin: '*' },
+  path: '/agents'
 });
 
 io.on('connection', socket => {
@@ -76,7 +76,8 @@ io.on('connection', socket => {
 if (!!argv.parent) {
   const socket = socketClient(argv.parent, {
     auth: { name: argv.name },
-    autoConnect: false
+    autoConnect: false,
+    path: '/agents'
   });
 
   socket.on('connect', () => {
