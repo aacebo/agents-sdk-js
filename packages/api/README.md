@@ -1,14 +1,8 @@
-# Agents SDK: Core
+# Agents SDK: API
 
-core interfaces/implementations
+the agent runtime
 
 > ⚠️ **Warning**: this project is not supported or affiliated with Microsoft in any way!
-
-## Install
-
-```bash
-$: npm install @agents.sdk/core
-```
 
 ## Dependencies
 
