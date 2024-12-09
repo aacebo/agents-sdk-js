@@ -1,0 +1,41 @@
+{
+  "name": "@agents.sdk/core",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/aacebo/agents-sdk-js",
+  "bugs": "https://github.com/aacebo/agents-sdk-js/issues",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aacebo/agents-sdk-js.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "sdk"
+  ],
+  "scripts": {
+    "clean": "npx rimraf ./dist",
+    "build": "npx tsup",
+    "test": "npx jest"
+  },
+  "peerDependencies": {
+    "@agents.sdk/config": "*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^22.0.0",
+    "jest": "^29.0.0",
+    "rimraf": "^6.0.0",
+    "ts-jest": "^29.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "latest"
+  }
+}
