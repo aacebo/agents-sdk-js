@@ -1,15 +1,10 @@
 #!/usr/bin/env node
 
-import http from 'node:http';
-import express from 'express';
-import debug from 'debug';
-import cors from 'cors';
-import socket from 'socket.io';
-import socketClient from 'socket.io-client';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 
 import pkg from '../package.json';
+import { Agent } from './agent';
 
 const argv = yargs(hideBin(process.argv))
   .version(pkg.version)
@@ -44,49 +39,8 @@ const argv = yargs(hideBin(process.argv))
   })
   .parseSync();
 
-const sockets: Array<string> = [];
-const app = express();
-const log = debug(`agents/${argv.name}`);
-log.enabled = true;
+const agent = new Agent(argv);
 
-app.use(express.json());
-app.use(cors());
-app.get('/', (_, res) => {
-  res.json({
-    name: argv.name,
-    prompt: argv.prompt,
-    model: argv.model,
-    parent: argv.parent,
-    sockets
-  });
-});
-
-const server = http.createServer(app);
-const io = new socket.Server(server, {
-  cors: { origin: '*' },
-  path: '/agents'
-});
-
-io.on('connection', socket => {
-  const name = socket.handshake.auth.name;
-  sockets.push(name);
-  log(`${name} connected...`);
-});
-
-if (!!argv.parent) {
-  const socket = socketClient(argv.parent, {
-    auth: { name: argv.name },
-    autoConnect: false,
-    path: '/agents'
-  });
-
-  socket.on('connect', () => {
-    log('connected to parent...');
-  });
-
-  socket.connect();
-}
-
-server.listen(argv.port, () => {
-  log(`🚀 listening on port ${argv.port}...`);
+agent.listen(() => {
+  agent.log(`🚀 listening on port ${argv.port}...`);
 });
