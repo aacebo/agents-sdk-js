@@ -1,0 +1,19 @@
+{
+  "name": "@agents.sdk/config",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://github.com/aacebo/agents-sdk-js",
+  "bugs": "https://github.com/aacebo/agents-sdk-js/issues",
+  "files": [
+    "eslint.config.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aacebo/agents-sdk-js.git",
+    "directory": "packages/config"
+  }
+}
