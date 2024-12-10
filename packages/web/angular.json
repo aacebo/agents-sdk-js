@@ -47,6 +47,9 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "allowedCommonJsDependencies": [
+              "feather-icons"
+            ],
             "assets": [
               {
                 "glob": "**/*",

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
@@ -8,7 +8,10 @@ import { BehaviorSubject, firstValueFrom } from 'rxjs';
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  host: { class: 'app-root' },
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   readonly state = new BehaviorSubject<any>(null);

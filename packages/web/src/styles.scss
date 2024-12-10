@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/cdk/overlay-prebuilt.css';
+
+@use 'tailwindcss/base';
+@use 'tailwindcss/components';
+@use 'tailwindcss/utilities';
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+:focus-visible {
+  outline: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    color: theme('colors.white');
+    background-color: theme('colors.slate.800');
+  }
+}
+
+.cdk-dialog-container {
+  height: inherit !important;
+}
+
