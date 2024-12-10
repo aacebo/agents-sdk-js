@@ -1,4 +1,6 @@
 import http from 'node:http';
+import path from 'node:path';
+
 import express from 'express';
 import cors from 'cors';
 import ioClient, { Socket } from 'socket.io-client';
@@ -31,7 +33,7 @@ export class Agent {
 
     app.use(express.json());
     app.use(cors());
-    app.get('/', (_, res) => {
+    app.get('/health', (_, res) => {
       res.json({
         name: options.name,
         description: options.description,
@@ -40,6 +42,11 @@ export class Agent {
         parent: options.parent,
         edges: this._peers.list,
       });
+    });
+
+    app.use(express.static(path.join(__dirname, '../../web/dist/web/browser')));
+    app.get('*', (_, res) => {
+      res.sendFile(path.join(__dirname, '../../web/dist/web/browser/index.html'));
     });
 
     if (options.parent) {
