@@ -40,10 +40,8 @@
     "uuid": "^11.0.3",
     "yargs": "^17.0.0"
   },
-  "peerDependencies": {
-    "@agents.sdk/config": "*"
-  },
   "devDependencies": {
+    "@agents.sdk/config": "*",
     "@types/cors": "^2.0.0",
     "@types/debug": "^4.0.0",
     "@types/express": "^5.0.0",

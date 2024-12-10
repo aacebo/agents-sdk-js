@@ -34,10 +34,11 @@ export class Agent {
     app.get('/', (_, res) => {
       res.json({
         name: options.name,
+        description: options.description,
         prompt: options.prompt,
         model: options.model,
         parent: options.parent,
-        edges: Object.keys(this._peers.list),
+        edges: this._peers.list,
       });
     });
 

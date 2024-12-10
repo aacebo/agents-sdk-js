@@ -1,10 +1,11 @@
-/** @type {import('tsup').Config} */
+/** @type {import('tsup').Options} */
 module.exports = {
   dts: true,
   minify: true,
   sourcemap: true,
   treeshake: true,
   splitting: true,
+  bundle: true,
   clean: true,
   outDir: 'dist',
   entry: ['src/index.ts'],
