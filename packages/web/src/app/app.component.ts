@@ -1,25 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
+import { AppInfo, AppService } from './app.service';
+import { AppSocket } from './app.socket';
+
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   host: { class: 'app-root' },
+  imports: [CommonModule, RouterOutlet],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  readonly state = new BehaviorSubject<any>(null);
+  readonly info = new BehaviorSubject<AppInfo | null>(null);
 
-  constructor(private readonly _http: HttpClient) { }
+  constructor(
+    private readonly _app: AppService,
+    private readonly _socket: AppSocket
+  ) { }
 
   async ngOnInit() {
-    const res = await firstValueFrom(this._http.get<any>('/health'));
-    this.state.next(res);
+    const info = await this._app.getInfo();
+    this.info.next(info);
   }
 }
