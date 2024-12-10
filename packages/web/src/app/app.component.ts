@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
-import { AppInfo, AppService } from './app.service';
+import { AppService } from './app.service';
 import { AppSocket } from './app.socket';
+import { AppState } from './app.state';
 
 @Component({
   selector: 'app-root',
@@ -15,16 +15,16 @@ import { AppSocket } from './app.socket';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit {
-  readonly info = new BehaviorSubject<AppInfo | null>(null);
-
+export class App implements OnInit {
   constructor(
     private readonly _app: AppService,
+    private readonly _state: AppState,
     private readonly _socket: AppSocket
   ) { }
 
   async ngOnInit() {
     const info = await this._app.getInfo();
-    this.info.next(info);
+    this._state.$info.next(info);
+    document.title = info.name;
   }
 }
