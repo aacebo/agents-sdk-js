@@ -1,13 +1,17 @@
 import http from 'node:http';
 import express from 'express';
-import debug from 'debug';
 import cors from 'cors';
-import io from 'socket.io';
 import ioClient, { Socket } from 'socket.io-client';
+import * as uuid from 'uuid';
 
-export interface AgentOptions {
+import { Logger } from './logger';
+import { PeerSockets } from './peer-sockets';
+import { ClientSockets } from './client-sockets';
+
+interface AgentOptions {
   readonly port: number;
   readonly name: string;
+  readonly description: string;
   readonly prompt: string;
   readonly model: string;
   readonly apiKey: string;
@@ -15,15 +19,15 @@ export interface AgentOptions {
 }
 
 export class Agent {
-  readonly log: debug.Debugger;
+  readonly log: Logger;
   private readonly _parent?: Socket;
   private readonly _server: http.Server;
-  private readonly _agentsServer: io.Server;
-  private readonly _clientsServer: io.Server;
-  private readonly _sockets: Record<string, io.Socket> = {};
+  private readonly _peers: PeerSockets;
+  private readonly _clients: ClientSockets;
 
   constructor(readonly options: AgentOptions) {
     const app = express();
+    this.log = new Logger(`@agent/${options.name}`);
 
     app.use(express.json());
     app.use(cors());
@@ -33,51 +37,59 @@ export class Agent {
         prompt: options.prompt,
         model: options.model,
         parent: options.parent,
-        sockets: Object.keys(this._sockets),
+        edges: Object.keys(this._peers.list),
       });
     });
-
-    this._server = http.createServer(app);
-    this.log = debug(`agents/${options.name}`);
-    this.log.enabled = true;
-    this._agentsServer = new io.Server(this._server, {
-      cors: { origin: '*' },
-      path: '/agents',
-    });
-
-    this._clientsServer = new io.Server(this._server, {
-      cors: { origin: '*' },
-      path: '/clients',
-    });
-
-    this._agentsServer.on('connection', this._onAgentConnect.bind(this));
-    this._clientsServer.on('connection', this._onClientConnect.bind(this));
 
     if (options.parent) {
       this._parent = ioClient(options.parent, {
-        auth: { name: options.name },
         autoConnect: false,
-        path: '/agents',
+        path: '/edges',
+        auth: {
+          name: options.name,
+          description: options.description
+        }
       });
 
-      this._parent.on('connect', this._onParentConnect.bind(this));
+      this._parent.on('connect', () => this.log.info('connected to parent'));
       this._parent.connect();
     }
+
+    this._server = http.createServer(app);
+    this._peers = new PeerSockets({
+      log: this.log,
+      server: this._server,
+    });
+
+    this._clients = new ClientSockets({
+      log: this.log,
+      server: this._server,
+      chat: {
+        clientOptions: { apiKey: options.apiKey },
+        model: options.model,
+        prompt: options.prompt
+      }
+    });
+
+    this._peers.on('connect', (e) => {
+      this._clients.functions.add(e.name, e.description, ({ text }) => new Promise<string>((resolve) => {
+        const id = uuid.v4();
+        const socket = this._peers.getByName(e.name);
+
+        socket.once(`message.${id}`, ({ content }: { content: string }) => {
+          resolve(content);
+        });
+
+        socket.emit('message', { id, content: text });
+      }));
+    });
+
+    this._peers.on('disconnect', (e) => {
+      this._clients.functions.remove(e.name);
+    });
   }
 
   listen(callback: () => void) {
     this._server.listen(this.options.port, callback);
-  }
-
-  private _onAgentConnect(socket: io.Socket) {
-    const name = socket.handshake.auth.name;
-    this._sockets[name] = socket;
-    this.log(`${name} connected...`);
-  }
-
-  private _onClientConnect(_: io.Socket) {}
-
-  private _onParentConnect() {
-    this.log('connected to parent...');
   }
 }

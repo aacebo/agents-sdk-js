@@ -18,6 +18,11 @@ const argv = yargs(hideBin(process.argv))
     describe: 'the agents name',
     demandOption: true,
   })
+  .option('description', {
+    type: 'string',
+    describe: 'the agents description',
+    demandOption: true
+  })
   .option('prompt', {
     type: 'string',
     describe: 'the agents prompt',
@@ -42,5 +47,5 @@ const argv = yargs(hideBin(process.argv))
 const agent = new Agent(argv);
 
 agent.listen(() => {
-  agent.log(`🚀 listening on port ${argv.port}...`);
+  agent.log.info(`🚀 listening on port ${argv.port}...`);
 });
