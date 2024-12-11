@@ -64,6 +64,7 @@ export class Home {
         updatedAt: new Date()
       };
     } else {
+      message.$meta = e.$meta;
       message.content = e.content;
       message.updatedAt = new Date();
     }

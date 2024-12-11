@@ -32,7 +32,7 @@ export class ClientSockets {
   private readonly _functions: Record<string, {
     readonly description: string;
     readonly parameters?: ObjectSchema;
-    readonly callback: Function<{ text: string }>;
+    readonly callback: Function<MessageEvent>;
   }> = { };
 
   constructor(private readonly _options: ClientSocketsOptions) {
@@ -49,20 +49,19 @@ export class ClientSockets {
   get functions() {
     return {
       get: () => this._functions,
-      add: (name: string, description: string, callback: Function<{ text: string }>) => {
+      add: (name: string, description: string, callback: Function<MessageEvent, MessageEvent>) => {
         this._functions[name] = {
           description,
           parameters: {
             type: 'object',
-            description: 'parameters to be sent to the assistant, required parameters should always be provided!',
             properties: {
-              text: {
+              content: {
                 type: 'string',
                 description: 'your message to the assistant'
               }
             },
             additionalProperties: false,
-            required: ['text'],
+            required: ['content'],
           },
           callback
         };
@@ -97,7 +96,9 @@ export class ClientSockets {
   private _onMessage(socket: io.Socket) {
     return async (e: MessageEvent) => {
       const id = uuid.v4();
-      const message = await this._chat.send({
+      const start = new Date();
+      const res = await this._chat.send({
+        id,
         functions: this._functions,
         input: {
           role: 'user',
@@ -116,10 +117,14 @@ export class ClientSockets {
         }
       });
 
-      this._clients[socket.id].messages.push(message);
+      this._clients[socket.id].messages.push(res.message);
       socket.emit(`message.${e.id}`, {
+        $meta: {
+          ...res.$meta,
+          $elapse: new Date().getTime() - start.getTime()
+        },
         id,
-        content: message.content
+        content: res.message.content
       });
     };
   }

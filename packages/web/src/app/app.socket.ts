@@ -3,6 +3,9 @@ import io, { Socket } from 'socket.io-client';
 import * as uuid from 'uuid';
 
 export interface MessageEvent {
+  readonly $meta?: {
+    readonly $elapse: number;
+  } & Omit<Record<string, any>, '$elapse'>;
   readonly id: string;
   readonly content: string;
 }

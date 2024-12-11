@@ -70,15 +70,14 @@ export class Agent {
     });
 
     this._peers.on('connect', (e) => {
-      this._clients.functions.add(e.name, e.description, ({ text }) => new Promise<string>((resolve) => {
-        const id = uuid.v4();
+      this._clients.functions.add(e.name, e.description, ({ id, content }) => new Promise<MessageEvent>((resolve) => {
         const socket = this._peers.getByName(e.name);
 
         socket.once(`message.${id}`, (e: MessageEvent) => {
-          resolve(e.content);
+          resolve(e);
         });
 
-        socket.emit('message', { id, content: text });
+        socket.emit('message', { id, content });
       }));
     });
 
@@ -130,7 +129,9 @@ export class Agent {
   private _onMessage(socket: Socket) {
     return async (e: MessageEvent) => {
       const id = uuid.v4();
-      const message = await this._chat.send({
+      const start = new Date();
+      const res = await this._chat.send({
+        id,
         functions: this._clients.functions.get(),
         input: {
           role: 'user',
@@ -155,8 +156,12 @@ export class Agent {
       });
 
       socket.emit(`message.${e.id}`, {
+        $meta: {
+          ...res.$meta,
+          $elapse: new Date().getTime() - start.getTime()
+        },
         id,
-        content: message.content
+        content: res.message.content
       });
     };
   }

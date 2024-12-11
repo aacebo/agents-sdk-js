@@ -2,16 +2,23 @@ import OpenAI, { ClientOptions } from 'openai';
 
 import { ObjectSchema } from './schema';
 import { Function } from './function';
+import { MessageEvent } from './message-event';
 
 interface ChatModelSendParams {
+  readonly id: string;
   readonly input: OpenAI.Chat.Completions.ChatCompletionMessageParam;
   readonly body: OpenAI.Chat.Completions.ChatCompletionCreateParams;
   readonly onChunk?: Function<OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta, void>;
   readonly functions?: Record<string, {
     readonly description: string;
     readonly parameters?: ObjectSchema;
-    readonly callback: Function;
+    readonly callback: Function<MessageEvent, MessageEvent>;
   }>;
+}
+
+interface ChatModelSendResponse {
+  readonly $meta: Record<string, any>;
+  readonly message: OpenAI.Chat.ChatCompletionMessage;
 }
 
 export class ChatModel {
@@ -21,7 +28,8 @@ export class ChatModel {
     this._client = new OpenAI(options);
   }
 
-  async send(params: ChatModelSendParams): Promise<OpenAI.Chat.ChatCompletionMessage> {
+  async send(params: ChatModelSendParams): Promise<ChatModelSendResponse> {
+    let $meta: Record<string, any> = { };
     params.body.messages.push(params.input);
 
     if (params.input.role === 'assistant' && params.input.tool_calls?.length) {
@@ -32,15 +40,21 @@ export class ChatModel {
           throw new Error(`function ${call.function.name} not found`);
         }
 
-        let output = await fn.callback(JSON.parse(call.function.arguments));
+        const start = new Date();
+        const res = await fn.callback({
+          ...JSON.parse(call.function.arguments),
+          id: params.id
+        });
 
-        if (typeof output !== 'string') {
-          output = JSON.stringify(output);
-        }
+        const elapse = new Date().getTime() - start.getTime();
+        $meta[call.function.name] = {
+          $elapse: elapse,
+          ...res.$meta
+        };
 
         params.body.messages.push({
           role: 'tool',
-          content: output,
+          content: res.content,
           tool_call_id: call.id
         });
       }
@@ -120,9 +134,14 @@ export class ChatModel {
     }
 
     if (message.tool_calls && message.tool_calls.length > 0) {
-      return this.send({ ...params, input: message });
+      const res = await this.send({ ...params, input: message });
+
+      return {
+        $meta: { ...$meta, ...res.$meta },
+        message: res.message
+      };
     }
 
-    return message;
+    return { $meta, message };
   }
 }
