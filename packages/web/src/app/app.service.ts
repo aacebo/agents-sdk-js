@@ -2,15 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { Agent } from './models';
+
 export interface AppInfo {
   readonly name: string;
   readonly description: string;
   readonly model: string;
   readonly prompt: string;
-  readonly edges: Array<{
-    readonly name: string;
-    readonly description: string;
-  }>;
+  readonly edges: Array<Agent>;
 }
 
 @Injectable({

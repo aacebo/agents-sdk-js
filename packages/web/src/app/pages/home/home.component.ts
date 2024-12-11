@@ -8,6 +8,7 @@ import { AppState } from '../../app.state';
 import { IconModule } from '../../components/icon';
 import { HotKeyModule } from '../../components/hotkey';
 import { MarkdownModule } from '../../components/markdown';
+import { CytoscapeModule } from '../../components/cytoscape';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +20,8 @@ import { MarkdownModule } from '../../components/markdown';
     FormsModule,
     IconModule,
     HotKeyModule,
-    MarkdownModule
+    MarkdownModule,
+    CytoscapeModule
   ],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush

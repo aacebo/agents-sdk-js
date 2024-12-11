@@ -1,5 +1,5 @@
 <div class="flex flex-col flex-1">
-  <div class="flex px-4 py-3 text-2xl shadow-lg bg-zinc-800">
+  <div class="flex px-4 py-3 text-lg shadow-lg bg-zinc-800">
     {{ (state.$info | async)?.name | titlecase }}
 
     <span class="flex-1"></span>
@@ -74,6 +74,13 @@
   </div>
 </div>
 
-<div class="flex flex-col max-lg:hidden">
-  sidebar
+<div class="flex flex-col w-1/3	max-lg:hidden border-l border-l-zinc-800">
+  <div class="flex px-4 py-3 text-lg shadow-lg bg-zinc-800">
+    Dependencies
+  </div>
+
+  <ag-cytoscape
+    [nodes]="(state.$nodes | async) || []"
+    [edges]="(state.$edges | async) || []"
+  />
 </div>

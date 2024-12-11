@@ -44,7 +44,6 @@ export class Cytoscape implements OnInit, OnDestroy {
 
   @Output() zoomChange = new EventEmitter<number>();
   @Output() nodesSelect = new EventEmitter<NodeData[]>();
-  @Output() positionChange = new EventEmitter<NodeData>();
 
   private _graph?: cytoscape.Core;
   private readonly _runZoom = debounce(() => this.zoom = this._graph?.zoom() || 0, 500);
@@ -55,7 +54,7 @@ export class Cytoscape implements OnInit, OnDestroy {
     this._graph = cytoscape({
       container: this._el.nativeElement,
       style: STYLES,
-      layout: layouts.FCose,
+      layout: layouts.Dagre,
       selectionType: 'single',
       zoom: this._zoom,
       boxSelectionEnabled: true,
@@ -80,22 +79,6 @@ export class Cytoscape implements OnInit, OnDestroy {
     this._graph.on('unselect', debounce((e: cytoscape.EventObject) => {
       this.nodesSelect.emit(e.cy.nodes(':selected').map(n => n.data()));
     }, 100));
-
-    this._graph.on('free', debounce((e: cytoscape.EventObjectNode | cytoscape.EventObjectEdge) => {
-      if (!e.target.isNode()) return;
-
-      const prev = e.target.data().position as cytoscape.Position;
-      const curr = e.target.position();
-
-      if (prev.x === curr.x && prev.y === curr.y) {
-        return;
-      }
-
-      this.positionChange.emit({
-        ...e.target.data(),
-        position: curr
-      });
-    }, 100));
   }
 
   ngOnDestroy() {
@@ -111,7 +94,7 @@ export class Cytoscape implements OnInit, OnDestroy {
   }
 
   fcose() {
-    this._graph?.layout(layouts.FCose).run();
+    this._graph?.layout(layouts.Dagre).run();
   }
 
   image() {
