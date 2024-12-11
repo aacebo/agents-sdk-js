@@ -53,24 +53,6 @@ export class Agent {
       res.sendFile(path.join(__dirname, '../../web/dist/web/browser/index.html'));
     });
 
-    if (options.parent) {
-      this._parent = ioClient(options.parent, {
-        autoConnect: false,
-        path: '/edges',
-        auth: {
-          name: options.name,
-          description: options.description
-        }
-      });
-
-      this._parent.on('connect', () => {
-        this.log.info('connected to parent...');
-        this._parent!.on('message', this._onMessage(this._parent!));
-      });
-
-      this._parent.connect();
-    }
-
     this._server = http.createServer(app);
     this._peers = new PeerSockets({
       log: this.log,
@@ -89,7 +71,6 @@ export class Agent {
 
     this._peers.on('connect', (e) => {
       this._clients.functions.add(e.name, e.description, ({ text }) => new Promise<string>((resolve) => {
-        console.log(`Peer Invoked: "${text}"`);
         const id = uuid.v4();
         const socket = this._peers.getByName(e.name);
 
@@ -104,6 +85,42 @@ export class Agent {
     this._peers.on('disconnect', (e) => {
       this._clients.functions.remove(e.name);
     });
+
+    this._peers.on('change', (edges) => {
+      if (!this._parent) return;
+      this._parent.emit('info', {
+        name: options.name,
+        description: options.description,
+        edges
+      });
+    });
+
+    if (options.parent) {
+      this._parent = ioClient(options.parent, {
+        autoConnect: false,
+        path: '/edges',
+        auth: {
+          name: options.name,
+          description: options.description,
+          edges: this._peers.list
+        }
+      });
+
+      this._parent.on('connect', () => {
+        this.log.info('connected to parent...');
+        this._parent!.on('message', this._onMessage(this._parent!));
+
+        setInterval(() => {
+          this._parent?.emit('info', {
+            name: options.name,
+            description: options.description,
+            edges: this._peers.list
+          });
+        }, 1000);
+      });
+
+      this._parent.connect();
+    }
   }
 
   listen(callback: () => void) {
@@ -112,7 +129,6 @@ export class Agent {
 
   private _onMessage(socket: Socket) {
     return async (e: MessageEvent) => {
-      this.log.info(`incoming parent message: "${JSON.stringify(e)}"`);
       const id = uuid.v4();
       const message = await this._chat.send({
         functions: this._clients.functions.get(),
