@@ -3,14 +3,11 @@ import io from 'socket.io';
 
 import { Logger } from './logger';
 import { Function } from './function';
+import { MessageEvent } from './message-event';
 
 interface PeerSocketsOptions {
   readonly log: Logger;
   readonly server: http.Server;
-}
-
-interface PeerMessageEvent {
-
 }
 
 interface PeerState {
@@ -94,7 +91,7 @@ export class PeerSockets {
   }
 
   private _onMessage(_: io.Socket) {
-    return (_: PeerMessageEvent) => {
+    return (_: MessageEvent) => {
 
     };
   }

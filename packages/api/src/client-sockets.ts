@@ -7,6 +7,7 @@ import { Logger } from './logger';
 import { ChatModel } from './chat-model';
 import { ObjectSchema } from './schema';
 import { Function } from './function';
+import { MessageEvent } from './message-event';
 
 interface ClientSocketsOptions {
   readonly log: Logger;
@@ -16,11 +17,6 @@ interface ClientSocketsOptions {
     readonly model: string;
     readonly prompt: string;
   };
-}
-
-interface ClientMessageEvent {
-  readonly id: string;
-  readonly content: string;
 }
 
 interface ClientState {
@@ -52,15 +48,21 @@ export class ClientSockets {
 
   get functions() {
     return {
+      get: () => this._functions,
       add: (name: string, description: string, callback: Function<{ text: string }>) => {
         this._functions[name] = {
           description,
           parameters: {
             type: 'object',
+            description: 'parameters to be sent to the assistant, required parameters should always be provided!',
             properties: {
-              text: { type: 'string' }
+              text: {
+                type: 'string',
+                description: 'your message to the assistant'
+              }
             },
-            required: ['text']
+            additionalProperties: false,
+            required: ['text'],
           },
           callback
         };
@@ -93,7 +95,7 @@ export class ClientSockets {
   }
 
   private _onMessage(socket: io.Socket) {
-    return async (e: ClientMessageEvent) => {
+    return async (e: MessageEvent) => {
       const id = uuid.v4();
       const message = await this._chat.send({
         functions: this._functions,
@@ -102,6 +104,7 @@ export class ClientSockets {
           content: e.content
         },
         body: {
+          temperature: 0,
           model: this._options.chat.model,
           messages: this._clients[socket.id].messages,
         },

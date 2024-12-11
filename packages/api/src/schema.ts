@@ -40,6 +40,7 @@ export interface ObjectSchema extends BaseSchema {
   readonly type: 'object';
   readonly properties?: { readonly [key: string]: Schema };
   readonly required?: string[] | boolean;
+  readonly additionalProperties?: boolean | Schema;
 }
 
 export interface ArraySchema extends BaseSchema {

@@ -14,10 +14,6 @@ interface ChatModelSendParams {
   }>;
 }
 
-type ToolCallParams = Omit<ChatModelSendParams, 'input'> & {
-  readonly input: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta;
-};
-
 export class ChatModel {
   private readonly _client: OpenAI;
 
@@ -36,28 +32,35 @@ export class ChatModel {
           throw new Error(`function ${call.function.name} not found`);
         }
 
-        const output = await fn.callback(JSON.parse(call.function.arguments));
+        let output = await fn.callback(JSON.parse(call.function.arguments));
+
+        if (typeof output !== 'string') {
+          output = JSON.stringify(output);
+        }
 
         params.body.messages.push({
           role: 'tool',
-          content: JSON.stringify(output),
+          content: output,
           tool_call_id: call.id
         });
       }
     }
 
+    const tools = Object.entries(params.functions || { }).map(([name, value]) => ({
+      type: 'function',
+      function: {
+        name,
+        description: value.description,
+        parameters: value.parameters || { },
+        strict: true
+      }
+    } as OpenAI.Chat.Completions.ChatCompletionTool));
+
     const stream = await this._client.chat.completions.create({
       ...params.body,
       stream: true,
-      tools: Object.entries(params.functions || { }).map(([name, value]) => ({
-        type: 'function',
-        function: {
-          name,
-          description: value.description,
-          parameters: value.parameters || { }
-        }
-      }))
-    });
+      tools: tools.length > 0 ? tools : undefined
+    } as OpenAI.ChatCompletionCreateParamsStreaming);
 
     const message: OpenAI.Chat.ChatCompletionMessage = {
       role: 'assistant',
@@ -68,8 +71,39 @@ export class ChatModel {
     for await (const chunk of stream) {
       const delta = chunk.choices[0].delta;
 
-      if (delta.tool_calls && delta.tool_calls.length > 0) {
-        return this._onToolCall({ ...params, input: delta });
+      if (delta.tool_calls) {
+        if (!message.tool_calls) {
+          message.tool_calls = [];
+        }
+
+        for (const call of delta.tool_calls) {
+          if ('index' in call) {
+            if (call.index === message.tool_calls.length) {
+              message.tool_calls.push({
+                id: '',
+                type: 'function',
+                function: {
+                  name: '',
+                  arguments: ''
+                }
+              });
+            }
+
+            if (call.id) {
+              message.tool_calls[call.index].id += call.id;
+            }
+
+            if (call.function?.name) {
+              message.tool_calls[call.index].function.name += call.function.name;
+            }
+
+            if (call.function?.arguments) {
+              message.tool_calls[call.index].function.arguments += call.function.arguments;
+            }
+          } else {
+            message.tool_calls.push(call);
+          }
+        }
       }
 
       if (delta.content) {
@@ -78,56 +112,17 @@ export class ChatModel {
         } else {
           message.content = delta.content;
         }
-      }
 
-      if (params.onChunk) {
-        await params.onChunk(delta);
+        if (params.onChunk) {
+          await params.onChunk(delta);
+        }
       }
+    }
+
+    if (message.tool_calls && message.tool_calls.length > 0) {
+      return this.send({ ...params, input: message });
     }
 
     return message;
-  }
-
-  private _onToolCall(params: ToolCallParams) {
-    const calls: OpenAI.ChatCompletionMessageToolCall[] = [];
-
-    for (const call of params.input.tool_calls || []) {
-      if ('index' in call) {
-        if (call.index === calls.length) {
-          calls.push({
-            id: '',
-            type: 'function',
-            function: {
-              name: '',
-              arguments: '{}'
-            }
-          });
-        }
-
-        if (call.id) {
-          calls[call.index].id = call.id;
-        }
-
-        if (call.function?.name) {
-          calls[call.index].function.name = call.function.name;
-        }
-
-        if (call.function?.arguments) {
-          calls[call.index].function.arguments = call.function.arguments;
-        }
-      } else {
-        calls.push(call);
-      }
-    }
-
-    return this.send({
-      ...params,
-      input: {
-        role: params.input.role || 'user',
-        content: params.input.content,
-        tool_calls: calls,
-        refusal: params.input.refusal
-      } as OpenAI.Chat.Completions.ChatCompletionMessageParam
-    });
   }
 }

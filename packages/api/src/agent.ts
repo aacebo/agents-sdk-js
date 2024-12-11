@@ -9,6 +9,8 @@ import * as uuid from 'uuid';
 import { Logger } from './logger';
 import { PeerSockets } from './peer-sockets';
 import { ClientSockets } from './client-sockets';
+import { MessageEvent } from './message-event';
+import { ChatModel } from './chat-model';
 
 interface AgentOptions {
   readonly port: number;
@@ -24,12 +26,14 @@ export class Agent {
   readonly log: Logger;
   private readonly _parent?: Socket;
   private readonly _server: http.Server;
+  private readonly _chat: ChatModel;
   private readonly _peers: PeerSockets;
   private readonly _clients: ClientSockets;
 
   constructor(readonly options: AgentOptions) {
     const app = express();
     this.log = new Logger(`@agent/${options.name}`);
+    this._chat = new ChatModel({ apiKey: options.apiKey });
 
     app.use(express.json());
     app.use(cors());
@@ -59,7 +63,11 @@ export class Agent {
         }
       });
 
-      this._parent.on('connect', () => this.log.info('connected to parent'));
+      this._parent.on('connect', () => {
+        this.log.info('connected to parent...');
+        this._parent!.on('message', this._onMessage(this._parent!));
+      });
+
       this._parent.connect();
     }
 
@@ -81,11 +89,12 @@ export class Agent {
 
     this._peers.on('connect', (e) => {
       this._clients.functions.add(e.name, e.description, ({ text }) => new Promise<string>((resolve) => {
+        console.log(`Peer Invoked: "${text}"`);
         const id = uuid.v4();
         const socket = this._peers.getByName(e.name);
 
-        socket.once(`message.${id}`, ({ content }: { content: string }) => {
-          resolve(content);
+        socket.once(`message.${id}`, (e: MessageEvent) => {
+          resolve(e.content);
         });
 
         socket.emit('message', { id, content: text });
@@ -99,5 +108,40 @@ export class Agent {
 
   listen(callback: () => void) {
     this._server.listen(this.options.port, callback);
+  }
+
+  private _onMessage(socket: Socket) {
+    return async (e: MessageEvent) => {
+      this.log.info(`incoming parent message: "${JSON.stringify(e)}"`);
+      const id = uuid.v4();
+      const message = await this._chat.send({
+        functions: this._clients.functions.get(),
+        input: {
+          role: 'user',
+          content: e.content
+        },
+        body: {
+          temperature: 0,
+          model: this.options.model,
+          messages: [
+            {
+              role: 'system',
+              content: this.options.prompt
+            }
+          ],
+        },
+        onChunk: (chunk) => {
+          socket.emit(`message.${e.id}.chunk`, {
+            id,
+            content: chunk.content
+          });
+        }
+      });
+
+      socket.emit(`message.${e.id}`, {
+        id,
+        content: message.content
+      });
+    };
   }
 }

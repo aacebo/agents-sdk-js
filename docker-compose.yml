@@ -11,9 +11,9 @@ services:
       DEBUG: '@agent*'
       PORT: 3000
       AGENT_NAME: 'mechanic'
-      AGENT_DESCRIPTION: 'a vehicle mechanic that can solve all your problems related to cars'
-      AGENT_PROMPT: 'you are a vehicle mechanic, you know everything about automobiles'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_DESCRIPTION: 'ask vehicle mechanic a question about vehicles'
+      AGENT_PROMPT: 'you are a vehicle mechanic, you know everything about automobiles. When calling tools, always provide required parameters!'
+      AGENT_MODEL: 'gpt-4'
       AGENT_API_KEY: $OPENAI_API_KEY
     volumes:
       - .:/home/node/app
@@ -30,10 +30,10 @@ services:
     environment:
       DEBUG: '@agent*'
       PORT: 3001
-      AGENT_NAME: 'engine-mechanic'
-      AGENT_DESCRIPTION: 'an engine mechanic that can solve all your problems related to car engines'
+      AGENT_NAME: 'engine_mechanic'
+      AGENT_DESCRIPTION: 'ask engine mechanic a question about vehicle engines'
       AGENT_PROMPT: 'you are a vehicle engine mechanic, you know everything about engines'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4'
       AGENT_API_KEY: $OPENAI_API_KEY
       AGENT_PARENT: 'ws://mechanic:3000'
     volumes:
@@ -53,10 +53,10 @@ services:
     environment:
       DEBUG: '@agent*'
       PORT: 3002
-      AGENT_NAME: 'transmission-mechanic'
-      AGENT_DESCRIPTION: 'a transmission mechanic that can solve all your problems related to car transmissions'
+      AGENT_NAME: 'transmission_mechanic'
+      AGENT_DESCRIPTION: 'ask transmission mechanic a question about vehicle transmissions'
       AGENT_PROMPT: 'you are a vehicle transmission mechanic, you know everything about transmissions'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4'
       AGENT_API_KEY: $OPENAI_API_KEY
       AGENT_PARENT: 'ws://mechanic:3000'
     volumes:
