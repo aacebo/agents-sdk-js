@@ -17,16 +17,26 @@
     </div>
   </div>
 
-  <div class="flex flex-col flex-1">
-    <div class="flex flex-col flex-1">
-      ...messages
+  <div class="flex flex-col flex-1 p-5">
+    <div class="flex flex-col flex-1 gap-2">
+      @for (message of state.$messages | async; track message.id) {
+        <div class="flex flex-col gap-1 transition-all px-4 py-3 rounded-lg text-sm border border-transparent hover:border-zinc-800">
+          <div class="flex font-medium">{{ message.role | titlecase }}</div>
+          <div [agMarkdown]="message.content"></div>
+        </div>
+      }
     </div>
 
-    <div class="flex flex-col mx-5 mb-5 shadow-lg rounded-xl overflow-hidden" style="background-color: #121212">
+    <div
+      class="flex flex-col shadow-lg rounded-xl overflow-hidden"
+      style="background-color: #121212"
+    >
       <input
         class="p-5"
         placeholder="Enter user message..."
         [(ngModel)]="text"
+        agHotKey="command+enter"
+        (agHotKeyPressed)="send()"
       />
 
       <div class="flex p-5">

@@ -11,7 +11,7 @@ import * as feathericons from 'feather-icons';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IconComponent implements OnChanges {
+export class Icon implements OnChanges {
   @Input() name!: keyof (typeof feathericons.icons);
 
   @Input()

@@ -1,6 +1,7 @@
 import http from 'node:http';
 import io from 'socket.io';
 import OpenAI, { ClientOptions } from 'openai';
+import * as uuid from 'uuid';
 
 import { Logger } from './logger';
 import { ChatModel } from './chat-model';
@@ -93,6 +94,7 @@ export class ClientSockets {
 
   private _onMessage(socket: io.Socket) {
     return async (e: ClientMessageEvent) => {
+      const id = uuid.v4();
       const message = await this._chat.send({
         functions: this._functions,
         input: {
@@ -104,11 +106,18 @@ export class ClientSockets {
           messages: this._clients[socket.id].messages,
         },
         onChunk: (chunk) => {
-          socket.emit(`message.${e.id}`, { content: chunk.content });
+          socket.emit(`message.${e.id}.chunk`, {
+            id,
+            content: chunk.content
+          });
         }
       });
 
       this._clients[socket.id].messages.push(message);
+      socket.emit(`message.${e.id}`, {
+        id,
+        content: message.content
+      });
     };
   }
 }
