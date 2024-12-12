@@ -21,6 +21,7 @@
     "@angular/router": "^19.0.0",
     "cytoscape": "^3.30.4",
     "cytoscape-dagre": "^2.5.0",
+    "date-fns": "^4.1.0",
     "feather-icons": "^4.29.2",
     "marked": "^15.0.3",
     "mousetrap": "^1.6.5",

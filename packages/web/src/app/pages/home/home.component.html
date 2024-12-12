@@ -33,10 +33,18 @@
 
           <div [agMarkdown]="message.content"></div>
 
-          <div class="flex flex-1 text-xs invisible transition-all group-hover/item:visible">
+          <div class="flex flex-1 gap-2 text-xs invisible transition-all group-hover/item:visible">
             <div class="flex opacity-70">
               {{ message.updatedAt | date: 'short' }}
             </div>
+
+            <div class="flex-1"></div>
+
+            @if (message.$meta; as $meta) {
+              <div class="flex opacity-70">
+                {{ $meta.$elapse | elapseTime }}
+              </div>
+            }
           </div>
         </div>
       }

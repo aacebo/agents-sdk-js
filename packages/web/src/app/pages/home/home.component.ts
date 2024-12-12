@@ -10,6 +10,7 @@ import { IconModule } from '../../components/icon';
 import { HotKeyModule } from '../../components/hotkey';
 import { MarkdownModule } from '../../components/markdown';
 import { CytoscapeModule } from '../../components/cytoscape';
+import { ElapseTimeModule } from '../../components/elapse-time';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +23,8 @@ import { CytoscapeModule } from '../../components/cytoscape';
     IconModule,
     HotKeyModule,
     MarkdownModule,
-    CytoscapeModule
+    CytoscapeModule,
+    ElapseTimeModule
   ],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
