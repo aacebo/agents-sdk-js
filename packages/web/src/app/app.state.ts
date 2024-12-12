@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, map } from 'rxjs';
+import { BehaviorSubject, filter, map, withLatestFrom } from 'rxjs';
 import cytoscape from 'cytoscape';
 
 import { AppInfo } from './app.service';
-import { Agent, Message } from './models';
+import { Agent, Message, Meta } from './models';
 
 class ArrayBehaviorSubject<T> extends BehaviorSubject<Array<T>> {
+  get last() {
+    return this.pipe(map(v => {
+      if (v.length === 0) return;
+      return v[v.length - 1];
+    }))
+  }
+
   push(...items: T[]) {
     const value = this.value;
     value.push(...items);
@@ -56,13 +63,16 @@ export class AppState {
   get $nodes() {
     return this.$info.pipe(
       filter(info => !!info),
-      map(info => {
+      withLatestFrom(this.$messages.last),
+      map(([info, message]) => {
         const nodes: Array<cytoscape.NodeDefinition> = [];
         const queue: Array<Agent> = [info];
+        const metaQueue: Array<Meta | undefined> = [message?.$meta];
         const visited: Record<string, boolean> = { };
 
         while (queue.length) {
           const agent = queue.shift();
+          const $meta = metaQueue.shift();
 
           if (!agent || visited[agent.name]) continue;
 
@@ -71,19 +81,24 @@ export class AppState {
             selectable: true,
             data: {
               id: agent.name,
-              // parent: info.name,
+              active: !!$meta,
               name: agent.name,
               description: agent.description,
               content: agent.name,
               weight: 50,
               size: (agent.edges.length * 2) || 1,
               fontSize: 15,
+              elapse: $meta?.$elapse,
               outgoingEdges: agent.edges.length,
             }
           });
 
           visited[agent.name] = true;
           queue.push(...agent.edges);
+
+          for (const edge of agent.edges) {
+            metaQueue.push(($meta || { } as any)[edge.name]);
+          }
         }
 
         return nodes;
@@ -94,13 +109,16 @@ export class AppState {
   get $edges() {
     return this.$info.pipe(
       filter(info => !!info),
-      map(info => {
+      withLatestFrom(this.$messages.last),
+      map(([info, message]) => {
         const edges: Array<cytoscape.EdgeDefinition> = [];
         const queue: Array<Agent> = [info];
+        const metaQueue: Array<Meta | undefined> = [message?.$meta];
         const visited: Record<string, boolean> = { };
 
         while (queue.length) {
           const agent = queue.shift();
+          const $meta = metaQueue.shift();
 
           if (!agent || visited[agent.name]) continue;
 
@@ -112,13 +130,18 @@ export class AppState {
                 id: `${agent.name} -> ${edge.name}`,
                 source: agent.name,
                 target: edge.name,
-                weight: 1
+                weight: 1,
+                active: !!(($meta || { } as any)[edge.name])
               }
             });
           }
 
           visited[agent.name] = true;
           queue.push(...agent.edges);
+
+          for (const edge of agent.edges) {
+            metaQueue.push(($meta || { } as any)[edge.name]);
+          }
         }
 
         return edges;
