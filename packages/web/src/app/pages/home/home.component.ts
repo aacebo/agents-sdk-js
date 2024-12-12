@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs';
 
 import { AppSocket, MessageEvent } from '../../app.socket';
 import { AppState } from '../../app.state';
@@ -29,6 +30,8 @@ import { CytoscapeModule } from '../../components/cytoscape';
 export class Home {
   text = '';
 
+  readonly $loading = new BehaviorSubject(0);
+
   constructor(
     readonly state: AppState,
     private readonly _socket: AppSocket
@@ -37,6 +40,7 @@ export class Home {
   async send() {
     const text = this.text;
     this.text = '';
+    this.$loading.next(this.$loading.value + 1);
 
     const id = this._socket.send(
       text,
@@ -70,6 +74,7 @@ export class Home {
     }
 
     this.state.$messages.upsert(message, v => v.id === message.id);
+    this.$loading.next(this.$loading.value - 1);
   }
 
   private _onChunk(e: MessageEvent) {
