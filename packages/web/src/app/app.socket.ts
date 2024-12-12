@@ -17,10 +17,7 @@ export class AppSocket {
   private readonly _socket: Socket;
 
   constructor() {
-    this._socket = io('/', {
-      path: '/clients'
-    });
-
+    this._socket = io('/', { path: '/consoles' });
     this._socket.on('connect', () => {
       console.info('connected...');
     });

@@ -19,6 +19,7 @@
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@agents.sdk/core": "*",
     "cytoscape": "^3.30.4",
     "cytoscape-dagre": "^2.5.0",
     "date-fns": "^4.1.0",

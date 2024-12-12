@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, filter, map, withLatestFrom } from 'rxjs';
 import cytoscape from 'cytoscape';
 
-import { AppInfo } from './app.service';
-import { Agent, Message, Meta } from './models';
+import { Agent, Message, Meta } from '@agents.sdk/core';
 
 class ArrayBehaviorSubject<T> extends BehaviorSubject<Array<T>> {
   get last() {
@@ -57,7 +56,7 @@ class ArrayBehaviorSubject<T> extends BehaviorSubject<Array<T>> {
   providedIn: 'root'
 })
 export class AppState {
-  readonly $info = new BehaviorSubject<AppInfo | null>(null);
+  readonly $info = new BehaviorSubject<Agent | null>(null);
   readonly $messages = new ArrayBehaviorSubject<Message>([ ]);
 
   get $nodes() {
@@ -86,17 +85,17 @@ export class AppState {
               description: agent.description,
               content: agent.name,
               weight: 50,
-              size: (agent.edges.length * 2) || 1,
+              size: (agent.agents.length * 2) || 1,
               fontSize: 15,
               elapse: $meta?.$elapse,
-              outgoingEdges: agent.edges.length,
+              outgoingEdges: agent.agents.length,
             }
           });
 
           visited[agent.name] = true;
-          queue.push(...agent.edges);
+          queue.push(...agent.agents);
 
-          for (const edge of agent.edges) {
+          for (const edge of agent.agents) {
             metaQueue.push(($meta || { } as any)[edge.name]);
           }
         }
@@ -122,7 +121,7 @@ export class AppState {
 
           if (!agent || visited[agent.name]) continue;
 
-          for (const edge of agent.edges) {
+          for (const edge of agent.agents) {
             edges.push({
               group: 'edges',
               selectable: false,
@@ -138,9 +137,9 @@ export class AppState {
           }
 
           visited[agent.name] = true;
-          queue.push(...agent.edges);
+          queue.push(...agent.agents);
 
-          for (const edge of agent.edges) {
+          for (const edge of agent.agents) {
             metaQueue.push(($meta || { } as any)[edge.name]);
           }
         }

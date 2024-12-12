@@ -4,7 +4,7 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 
 import pkg from '../package.json';
-import { Agent } from './agent';
+import { App } from './app';
 
 const argv = yargs(hideBin(process.argv))
   .version(pkg.version)
@@ -50,8 +50,8 @@ const argv = yargs(hideBin(process.argv))
   })
   .parseSync();
 
-const agent = new Agent(argv);
+const app = new App(argv);
 
-agent.listen(() => {
-  agent.log.info(`🚀 listening on port ${argv.port}...`);
+app.listen(() => {
+  app.log.info(`🚀 listening on port ${argv.port}...`);
 });

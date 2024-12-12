@@ -1,19 +1,22 @@
 import OpenAI, { ClientOptions } from 'openai';
 
+import { MessageEvent } from '@agents.sdk/core';
+
 import { ObjectSchema } from './schema';
 import { Function } from './function';
-import { MessageEvent } from './message-event';
+
+export interface FunctionDefinition {
+  readonly description: string;
+  readonly parameters?: ObjectSchema;
+  readonly callback: Function<MessageEvent, MessageEvent>;
+}
 
 interface ChatModelSendParams {
   readonly id: string;
   readonly input: OpenAI.Chat.Completions.ChatCompletionMessageParam;
   readonly body: OpenAI.Chat.Completions.ChatCompletionCreateParams;
   readonly onChunk?: Function<OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta, void>;
-  readonly functions?: Record<string, {
-    readonly description: string;
-    readonly parameters?: ObjectSchema;
-    readonly callback: Function<MessageEvent, MessageEvent>;
-  }>;
+  readonly functions?: Record<string, FunctionDefinition>;
 }
 
 interface ChatModelSendResponse {

@@ -8,7 +8,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      DEBUG: '@agent*'
+      DEBUG: 'mechanic*'
       PORT: 3000
       AGENT_NAME: 'mechanic'
       AGENT_DESCRIPTION: 'ask vehicle mechanic a question about vehicles'
@@ -28,7 +28,7 @@ services:
     ports:
       - 3001:3001
     environment:
-      DEBUG: '@agent*'
+      DEBUG: 'engine_mechanic*'
       PORT: 3001
       AGENT_NAME: 'engine_mechanic'
       AGENT_DESCRIPTION: 'ask engine mechanic a question about vehicle engines'
@@ -51,7 +51,7 @@ services:
     ports:
       - 3002:3002
     environment:
-      DEBUG: '@agent*'
+      DEBUG: 'transmission_mechanic*'
       PORT: 3002
       AGENT_NAME: 'transmission_mechanic'
       AGENT_DESCRIPTION: 'ask transmission mechanic a question about vehicle transmissions'
@@ -74,7 +74,7 @@ services:
     ports:
       - 3003:3003
     environment:
-      DEBUG: '@agent*'
+      DEBUG: 'automatic_transmission_mechanic*'
       PORT: 3003
       AGENT_NAME: 'automatic_transmission_mechanic'
       AGENT_DESCRIPTION: 'ask automatic transmission mechanic a question about automatic vehicle transmissions'
@@ -97,7 +97,7 @@ services:
     ports:
       - 3004:3004
     environment:
-      DEBUG: '@agent*'
+      DEBUG: 'manual_transmission_mechanic*'
       PORT: 3004
       AGENT_NAME: 'manual_transmission_mechanic'
       AGENT_DESCRIPTION: 'ask manual transmission mechanic a question about manual vehicle transmissions'

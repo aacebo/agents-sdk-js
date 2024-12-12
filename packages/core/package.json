@@ -1,13 +1,10 @@
 {
-  "name": "@agents.sdk/api",
+  "name": "@agents.sdk/core",
   "version": "0.0.0",
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "agent": "./dist/index.js"
-  },
   "homepage": "https://github.com/aacebo/agents-sdk-js",
   "bugs": "https://github.com/aacebo/agents-sdk-js/issues",
   "files": [
@@ -17,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/aacebo/agents-sdk-js.git",
-    "directory": "packages/api"
+    "directory": "packages/core"
   },
   "keywords": [
     "ai",
@@ -30,25 +27,10 @@
     "start": "node .",
     "test": "npx jest"
   },
-  "dependencies": {
-    "@agents.sdk/core": "*",
-    "cors": "^2.0.0",
-    "debug": "^4.0.0",
-    "express": "^4.0.0",
-    "openai": "^4.0.0",
-    "socket.io": "^4.0.0",
-    "socket.io-client": "^4.0.0",
-    "uuid": "^11.0.3",
-    "yargs": "^17.0.0"
-  },
+  "dependencies": { },
   "devDependencies": {
     "@agents.sdk/config": "*",
-    "@types/cors": "^2.0.0",
-    "@types/debug": "^4.0.0",
-    "@types/express": "^5.0.0",
     "@types/jest": "^29.0.0",
-    "@types/node": "^22.0.0",
-    "@types/yargs": "^17.0.0",
     "jest": "^29.0.0",
     "rimraf": "^6.0.0",
     "ts-jest": "^29.0.0",
