@@ -57,7 +57,7 @@ export class Cytoscape implements OnInit, OnDestroy {
       layout: layouts.Dagre,
       selectionType: 'single',
       zoom: this._zoom,
-      boxSelectionEnabled: true,
+      // boxSelectionEnabled: true,
       elements: {
         nodes: this.nodes,
         edges: this.edges,

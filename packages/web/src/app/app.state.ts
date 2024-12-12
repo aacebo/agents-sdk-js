@@ -77,7 +77,7 @@ export class AppState {
 
           nodes.push({
             group: 'nodes',
-            selectable: true,
+            selectable: false,
             data: {
               id: agent.name,
               active: !!$meta,
