@@ -1,13 +1,19 @@
 import { Stylesheet } from 'cytoscape';
+import { marked } from 'marked';
+import { formatDuration } from 'date-fns';
+
+import { NodeData } from './node-data';
 
 export const STYLES: Stylesheet[] = [
   {
     selector: 'node',
     style: {
       color: '#fff',
-      label: 'data(content)',
       'text-wrap': 'wrap',
       'text-valign': 'center',
+      label: (e: cytoscape.NodeSingular) => {
+        return e.data().content;
+      },
       'background-color': (e) => {
         return e.data().active ? '#008b6e' : 'gray';
       }
@@ -37,10 +43,20 @@ export const STYLES: Stylesheet[] = [
   {
     selector: 'edge',
     style: {
+      color: '#fff',
       width: '0.5px',
       'curve-style': 'bezier',
       'target-arrow-shape': 'triangle',
       'arrow-scale': 0.5,
+      label: (e: cytoscape.EdgeSingular) => {
+        const elapse = (e.data() as any).elapse;
+
+        if (elapse) {
+          return formatDuration({ seconds: +elapse / 1000 });
+        }
+
+        return '';
+      },
       'line-color': (e) => {
         return e.data().active ? '#008b6e' : 'gray';
       },

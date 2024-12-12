@@ -131,6 +131,7 @@ export class AppState {
                 source: agent.name,
                 target: edge.name,
                 weight: 1,
+                elapse: ($meta || { } as any)[edge.name]?.$elapse,
                 active: !!(($meta || { } as any)[edge.name])
               }
             });

@@ -6,6 +6,7 @@ export interface NodeData {
   readonly content: string;
   readonly size?: number;
   readonly outgoingEdges?: number;
+  readonly elapse?: number;
   readonly weight: number;
   readonly fontSize: number;
 }
