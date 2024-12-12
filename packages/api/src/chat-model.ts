@@ -1,4 +1,5 @@
 import OpenAI, { ClientOptions } from 'openai';
+import { Stream } from 'openai/streaming';
 
 import { MessageEvent } from '@agents.sdk/core';
 
@@ -73,65 +74,68 @@ export class ChatModel {
       }
     } as OpenAI.Chat.Completions.ChatCompletionTool));
 
-    const stream = await this._client.chat.completions.create({
+    const res = await this._client.chat.completions.create({
       ...params.body,
-      stream: true,
       tools: tools.length > 0 ? tools : undefined
-    } as OpenAI.ChatCompletionCreateParamsStreaming);
+    });
 
-    const message: OpenAI.Chat.ChatCompletionMessage = {
+    let message: OpenAI.Chat.ChatCompletionMessage = {
       role: 'assistant',
       content: '',
       refusal: null
     };
 
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0].delta;
+    if (!(res instanceof Stream)) {
+      message = res.choices[0].message;
+    } else {
+      for await (const chunk of res) {
+        const delta = chunk.choices[0].delta;
 
-      if (delta.tool_calls) {
-        if (!message.tool_calls) {
-          message.tool_calls = [];
-        }
+        if (delta.tool_calls) {
+          if (!message.tool_calls) {
+            message.tool_calls = [];
+          }
 
-        for (const call of delta.tool_calls) {
-          if ('index' in call) {
-            if (call.index === message.tool_calls.length) {
-              message.tool_calls.push({
-                id: '',
-                type: 'function',
-                function: {
-                  name: '',
-                  arguments: ''
-                }
-              });
+          for (const call of delta.tool_calls) {
+            if ('index' in call) {
+              if (call.index === message.tool_calls.length) {
+                message.tool_calls.push({
+                  id: '',
+                  type: 'function',
+                  function: {
+                    name: '',
+                    arguments: ''
+                  }
+                });
+              }
+
+              if (call.id) {
+                message.tool_calls[call.index].id += call.id;
+              }
+
+              if (call.function?.name) {
+                message.tool_calls[call.index].function.name += call.function.name;
+              }
+
+              if (call.function?.arguments) {
+                message.tool_calls[call.index].function.arguments += call.function.arguments;
+              }
+            } else {
+              message.tool_calls.push(call);
             }
-
-            if (call.id) {
-              message.tool_calls[call.index].id += call.id;
-            }
-
-            if (call.function?.name) {
-              message.tool_calls[call.index].function.name += call.function.name;
-            }
-
-            if (call.function?.arguments) {
-              message.tool_calls[call.index].function.arguments += call.function.arguments;
-            }
-          } else {
-            message.tool_calls.push(call);
           }
         }
-      }
 
-      if (delta.content) {
-        if (message.content) {
-          message.content += delta.content;
-        } else {
-          message.content = delta.content;
-        }
+        if (delta.content) {
+          if (message.content) {
+            message.content += delta.content;
+          } else {
+            message.content = delta.content;
+          }
 
-        if (params.onChunk) {
-          await params.onChunk(delta);
+          if (params.onChunk) {
+            await params.onChunk(delta);
+          }
         }
       }
     }

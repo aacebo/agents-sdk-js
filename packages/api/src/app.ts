@@ -159,15 +159,17 @@ export class App {
 
   protected async onParentMessage(event: MessageEvent) {
     const start = new Date();
+    const functions = this.functions;
     const res = await this.chat.send({
       id: event.id,
-      functions: this.functions,
+      functions,
       input: {
         role: 'user',
         content: event.content
       },
       body: {
         temperature: 0,
+        stream: false,
         model: this.options.model,
         messages: [
           {
@@ -189,7 +191,10 @@ export class App {
   }
 
   protected onConsoleConnect({ socket }: { socket: io.Socket }) {
-    this._messages[socket.id] = [];
+    this._messages[socket.id] = [{
+      role: 'system',
+      content: this.options.prompt
+    }];
   }
 
   protected onConsoleDisconnect({ socket }: { socket: io.Socket }) {
@@ -199,15 +204,17 @@ export class App {
   protected async onConsoleMessage({ socket, event }: { socket: io.Socket; event: MessageEvent; }) {
     const start = new Date();
     const id = uuid.v4();
+    const functions = this.functions;
     const res = await this.chat.send({
       id: id,
-      functions: this.functions,
+      functions,
       input: {
         role: 'user',
         content: event.content
       },
       body: {
         temperature: 0,
+        stream: true,
         model: this.state.value.model,
         messages: this._messages[socket.id],
       },
