@@ -13,7 +13,7 @@ services:
       AGENT_NAME: 'mechanic'
       AGENT_DESCRIPTION: 'ask vehicle mechanic a question about vehicles'
       AGENT_PROMPT: 'you are a vehicle mechanic, you know everything about automobiles. When calling tools, always provide required parameters!'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4o-mini'
       AGENT_API_KEY: $OPENAI_API_KEY
     volumes:
       - .:/home/node/app
@@ -33,7 +33,7 @@ services:
       AGENT_NAME: 'engine_mechanic'
       AGENT_DESCRIPTION: 'ask engine mechanic a question about vehicle engines'
       AGENT_PROMPT: 'you are a vehicle engine mechanic, you know everything about engines'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4o-mini'
       AGENT_API_KEY: $OPENAI_API_KEY
       AGENT_PARENT: 'ws://mechanic:3000'
     volumes:
@@ -56,7 +56,7 @@ services:
       AGENT_NAME: 'transmission_mechanic'
       AGENT_DESCRIPTION: 'ask transmission mechanic a question about vehicle transmissions'
       AGENT_PROMPT: 'you are a vehicle transmission mechanic, you know everything about transmissions'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4o-mini'
       AGENT_API_KEY: $OPENAI_API_KEY
       AGENT_PARENT: 'ws://mechanic:3000'
     volumes:
@@ -79,7 +79,7 @@ services:
       AGENT_NAME: 'automatic_transmission_mechanic'
       AGENT_DESCRIPTION: 'ask automatic transmission mechanic a question about automatic vehicle transmissions'
       AGENT_PROMPT: 'you are an automatic vehicle transmission mechanic, you know everything about automatic transmissions'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4o-mini'
       AGENT_API_KEY: $OPENAI_API_KEY
       AGENT_PARENT: 'ws://transmission-mechanic:3002'
     volumes:
@@ -102,7 +102,7 @@ services:
       AGENT_NAME: 'manual_transmission_mechanic'
       AGENT_DESCRIPTION: 'ask manual transmission mechanic a question about manual vehicle transmissions'
       AGENT_PROMPT: 'you are an manual vehicle transmission mechanic, you know everything about manual transmissions'
-      AGENT_MODEL: 'gpt-4o'
+      AGENT_MODEL: 'gpt-4o-mini'
       AGENT_API_KEY: $OPENAI_API_KEY
       AGENT_PARENT: 'ws://transmission-mechanic:3002'
     volumes:
