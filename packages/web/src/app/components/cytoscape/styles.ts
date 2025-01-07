@@ -1,8 +1,5 @@
 import { Stylesheet } from 'cytoscape';
-import { marked } from 'marked';
 import { formatDuration } from 'date-fns';
-
-import { NodeData } from './node-data';
 
 export const STYLES: Stylesheet[] = [
   {
@@ -45,6 +42,7 @@ export const STYLES: Stylesheet[] = [
     style: {
       color: '#fff',
       width: '0.5px',
+      'font-size': '10',
       'curve-style': 'bezier',
       'target-arrow-shape': 'triangle',
       'arrow-scale': 0.5,
