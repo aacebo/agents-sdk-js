@@ -48,7 +48,9 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": [
-              "feather-icons"
+              "feather-icons",
+              "mousetrap",
+              "cytoscape-dagre"
             ],
             "assets": [
               {
