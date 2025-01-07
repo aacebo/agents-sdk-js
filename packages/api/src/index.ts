@@ -17,36 +17,36 @@ const argv = yargs(hideBin(process.argv))
     type: 'string',
     describe: 'the agents name',
     demandOption: true,
-    default: process.env.AGENT_NAME
+    default: process.env.AGENT_NAME,
   })
   .option('description', {
     type: 'string',
     describe: 'the agents description',
     demandOption: true,
-    default: process.env.AGENT_DESCRIPTION
+    default: process.env.AGENT_DESCRIPTION,
   })
   .option('prompt', {
     type: 'string',
     describe: 'the agents prompt',
     demandOption: true,
-    default: process.env.AGENT_PROMPT
+    default: process.env.AGENT_PROMPT,
   })
   .option('model', {
     type: 'string',
     describe: 'the LLM model to use',
     demandOption: true,
-    default: process.env.AGENT_MODEL
+    default: process.env.AGENT_MODEL,
   })
   .option('api-key', {
     type: 'string',
     describe: 'the API key to use for the LLM',
     demandOption: true,
-    default: process.env.AGENT_API_KEY || process.env.OPENAI_API_KEY
+    default: process.env.AGENT_API_KEY || process.env.OPENAI_API_KEY,
   })
   .option('parent', {
     type: 'string',
     describe: 'the parent agents url to connect to',
-    default: process.env.AGENT_PARENT
+    default: process.env.AGENT_PARENT,
   })
   .parseSync();
 

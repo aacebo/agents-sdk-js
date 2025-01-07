@@ -6,6 +6,6 @@ import { ElapseTime } from './elapse-time.pipe';
 @NgModule({
   declarations: [ElapseTime],
   exports: [ElapseTime],
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
-export class ElapseTimeModule { }
+export class ElapseTimeModule {}

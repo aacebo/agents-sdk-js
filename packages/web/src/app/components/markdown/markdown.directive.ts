@@ -3,16 +3,18 @@ import { marked } from 'marked';
 
 @Directive({
   selector: '[agMarkdown]',
-  standalone: false
+  standalone: false,
 })
 export class Markdown {
   @Input()
-  get agMarkdown() { return this._agMarkdown; }
+  get agMarkdown() {
+    return this._agMarkdown;
+  }
   set agMarkdown(v) {
     this._agMarkdown = v;
     this.el.nativeElement.innerHTML = marked(v, { async: false });
   }
   private _agMarkdown: string;
 
-  constructor(readonly el: ElementRef<HTMLElement>) { }
+  constructor(readonly el: ElementRef<HTMLElement>) {}
 }

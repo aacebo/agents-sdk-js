@@ -13,14 +13,14 @@ import { AppState } from './app.state';
   host: { class: 'app-root' },
   imports: [CommonModule, RouterOutlet],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App implements OnInit {
   constructor(
     private readonly _app: AppService,
     private readonly _state: AppState,
     private readonly _socket: AppSocket
-  ) { }
+  ) {}
 
   async ngOnInit() {
     const info = await this._app.getInfo();

@@ -3,7 +3,7 @@ import { formatDistanceToNowStrict, formatDuration } from 'date-fns';
 
 @Pipe({
   name: 'elapseTime',
-  standalone: false
+  standalone: false,
 })
 export class ElapseTime implements PipeTransform {
   transform(v: Date | string | number | undefined | null) {

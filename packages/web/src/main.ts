@@ -6,5 +6,4 @@ import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 
 cytoscape.use(dagre);
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+bootstrapApplication(App, appConfig).catch((err) => console.error(err));

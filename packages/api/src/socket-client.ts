@@ -26,14 +26,14 @@ export class SocketClient<StateEvent> {
     connect: () => {},
     disconnect: () => {},
     'events.state': () => {},
-    'events.message': () => {}
+    'events.message': () => {},
   };
 
   constructor(options: SocketClientOptions) {
     this._log = options.log;
     this._client = ioClient(options.url, {
       ...options.options,
-      auth: { name: options.name }
+      auth: { name: options.name },
     });
 
     this._client.on('connect', this.onConnect.bind(this));

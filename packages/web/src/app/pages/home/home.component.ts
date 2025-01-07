@@ -24,10 +24,10 @@ import { ElapseTimeModule } from '../../components/elapse-time';
     HotKeyModule,
     MarkdownModule,
     CytoscapeModule,
-    ElapseTimeModule
+    ElapseTimeModule,
   ],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
   text = '';
@@ -37,37 +37,33 @@ export class Home {
   constructor(
     readonly state: AppState,
     private readonly _socket: AppSocket
-  ) { }
+  ) {}
 
   async send() {
     const text = this.text;
     this.text = '';
     this.$loading.next(this.$loading.value + 1);
 
-    const id = this._socket.send(
-      text,
-      this._onMessage.bind(this),
-      this._onChunk.bind(this)
-    );
+    const id = this._socket.send(text, this._onMessage.bind(this), this._onChunk.bind(this));
 
     this.state.$messages.push({
       id,
       role: 'user',
       content: text,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
   }
 
   private _onMessage(e: MessageEvent) {
-    let message = this.state.$messages.value.find(v => v.id === e.id);
+    let message = this.state.$messages.value.find((v) => v.id === e.id);
 
     if (!message) {
       message = {
         ...e,
         role: 'assistant',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
     } else {
       message.$meta = e.$meta;
@@ -75,25 +71,25 @@ export class Home {
       message.updatedAt = new Date();
     }
 
-    this.state.$messages.upsert(message, v => v.id === message.id);
+    this.state.$messages.upsert(message, (v) => v.id === message.id);
     this.$loading.next(this.$loading.value - 1);
   }
 
   private _onChunk(e: MessageEvent) {
-    let message = this.state.$messages.value.find(v => v.id === e.id);
+    let message = this.state.$messages.value.find((v) => v.id === e.id);
 
     if (!message) {
       message = {
         ...e,
         role: 'assistant',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
     } else {
       message.content += e.content;
       message.updatedAt = new Date();
     }
 
-    this.state.$messages.upsert(message, v => v.id === message.id);
+    this.state.$messages.upsert(message, (v) => v.id === message.id);
   }
 }

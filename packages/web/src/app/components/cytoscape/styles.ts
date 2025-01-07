@@ -16,29 +16,29 @@ export const STYLES: Stylesheet[] = [
       },
       'background-color': (e) => {
         return e.data().active ? '#008b6e' : 'gray';
-      }
-    }
+      },
+    },
   },
   {
     selector: 'node:selected',
     style: {
       'border-width': '1px',
       'border-color': 'yellow',
-      color: 'yellow'
-    }
+      color: 'yellow',
+    },
   },
   {
     selector: 'node[fontSize]',
     style: {
-      'font-size': 'data(fontSize)'
-    }
+      'font-size': 'data(fontSize)',
+    },
   },
   {
     selector: 'node[weight]',
     style: {
       height: 'data(weight)',
-      width: 'data(weight)'
-    }
+      width: 'data(weight)',
+    },
   },
   {
     selector: 'edge',
@@ -63,6 +63,6 @@ export const STYLES: Stylesheet[] = [
       'target-arrow-color': (e) => {
         return e.data().active ? '#008b6e' : 'gray';
       },
-    }
-  }
+    },
+  },
 ];

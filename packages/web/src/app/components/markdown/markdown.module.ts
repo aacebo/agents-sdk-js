@@ -4,6 +4,6 @@ import { Markdown } from './markdown.directive';
 
 @NgModule({
   declarations: [Markdown],
-  exports: [Markdown]
+  exports: [Markdown],
 })
-export class MarkdownModule { }
+export class MarkdownModule {}

@@ -4,6 +4,6 @@ import { HotKey } from './hotkey.directive';
 
 @NgModule({
   declarations: [HotKey],
-  exports: [HotKey]
+  exports: [HotKey],
 })
-export class HotKeyModule { }
+export class HotKeyModule {}

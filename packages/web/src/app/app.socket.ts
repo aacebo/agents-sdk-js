@@ -11,7 +11,7 @@ export interface MessageEvent {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AppSocket {
   private readonly _socket: Socket;
@@ -39,7 +39,7 @@ export class AppSocket {
 
     this._socket.emit('message', {
       id,
-      content: text
+      content: text,
     });
 
     return id;

@@ -27,7 +27,7 @@
     "start": "node .",
     "test": "npx jest"
   },
-  "dependencies": { },
+  "dependencies": {},
   "devDependencies": {
     "@agents.sdk/config": "*",
     "@types/jest": "^29.0.0",

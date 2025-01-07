@@ -3,10 +3,12 @@ import * as uuid from 'uuid';
 import { Function } from './function';
 
 export class State<T> {
-  get value() { return this._value; }
+  get value() {
+    return this._value;
+  }
   private _value: T;
 
-  private _subscriptions: Record<string, Function<T, void>> = { };
+  private _subscriptions: Record<string, Function<T, void>> = {};
 
   constructor(value: T) {
     this._value = value;

@@ -6,6 +6,6 @@ import { Cytoscape } from './cytoscape.component';
 @NgModule({
   declarations: [Cytoscape],
   exports: [Cytoscape],
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
-export class CytoscapeModule { }
+export class CytoscapeModule {}

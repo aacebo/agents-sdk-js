@@ -14,42 +14,54 @@ export interface SocketServerOptions {
 export interface SocketServerEvents<StateEvent> {
   connect: Function<{ readonly socket: io.Socket }, void>;
   disconnect: Function<{ readonly socket: io.Socket }, void>;
-  'events.state': Function<{
-    readonly socket: io.Socket;
-    readonly event: StateEvent;
-  }, void>;
-  'events.message': Function<{
-    readonly socket: io.Socket;
-    readonly event: MessageEvent;
-  }, void>;
-  'events.message.chunk': Function<{
-    readonly socket: io.Socket;
-    readonly event: MessageEvent;
-  }, void>;
-  'events.message.delete': Function<{
-    readonly socket: io.Socket;
-    readonly event: MessageDeleteEvent;
-  }, void>;
+  'events.state': Function<
+    {
+      readonly socket: io.Socket;
+      readonly event: StateEvent;
+    },
+    void
+  >;
+  'events.message': Function<
+    {
+      readonly socket: io.Socket;
+      readonly event: MessageEvent;
+    },
+    void
+  >;
+  'events.message.chunk': Function<
+    {
+      readonly socket: io.Socket;
+      readonly event: MessageEvent;
+    },
+    void
+  >;
+  'events.message.delete': Function<
+    {
+      readonly socket: io.Socket;
+      readonly event: MessageDeleteEvent;
+    },
+    void
+  >;
 }
 
 export class SocketServer<StateEvent> {
   private readonly _log: Logger;
   private readonly _server: io.Server;
-  private readonly _sockets: Record<string, io.Socket> = { };
+  private readonly _sockets: Record<string, io.Socket> = {};
   private readonly _events: SocketServerEvents<StateEvent> = {
     connect: () => {},
     disconnect: () => {},
     'events.state': () => {},
     'events.message': () => {},
     'events.message.chunk': () => {},
-    'events.message.delete': () => {}
+    'events.message.delete': () => {},
   };
 
   constructor(options: SocketServerOptions) {
     this._log = options.log.fork('sockets');
     this._server = new io.Server(options.server, {
       cors: { origin: '*' },
-      ...options.io
+      ...options.io,
     });
 
     this._server.on('connection', this.onConnect.bind(this));
@@ -67,7 +79,7 @@ export class SocketServer<StateEvent> {
   }
 
   getByName(name: string) {
-    return Object.values(this._sockets).find(s => s.handshake.auth.name === name);
+    return Object.values(this._sockets).find((s) => s.handshake.auth.name === name);
   }
 
   protected onConnect(socket: io.Socket) {

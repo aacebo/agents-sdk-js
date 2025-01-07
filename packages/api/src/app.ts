@@ -39,7 +39,7 @@ export class App {
   protected chat: ChatModel;
 
   private readonly _server: http.Server;
-  private readonly _messages: Record<string, Array<OpenAI.ChatCompletionMessageParam>> = { };
+  private readonly _messages: Record<string, Array<OpenAI.ChatCompletionMessageParam>> = {};
   private readonly _sockets: {
     parent?: SocketClient<Agent>;
     agents: SocketServer<Agent>;
@@ -47,7 +47,7 @@ export class App {
   };
 
   protected get functions() {
-    const functions: Record<string, FunctionDefinition> = { };
+    const functions: Record<string, FunctionDefinition> = {};
 
     for (const agent of Object.values(this.state.value.agents)) {
       const callback = this.onAgentTool(agent.name);
@@ -61,13 +61,13 @@ export class App {
           properties: {
             content: {
               type: 'string',
-              description: 'your message to the assistant'
-            }
+              description: 'your message to the assistant',
+            },
           },
           additionalProperties: false,
           required: ['content'],
         },
-        callback
+        callback,
       };
     }
 
@@ -83,7 +83,7 @@ export class App {
       description: options.description,
       prompt: options.prompt,
       model: options.model,
-      agents: { }
+      agents: {},
     });
 
     app.use(express.json());
@@ -99,13 +99,13 @@ export class App {
       agents: new SocketServer({
         log: this.log.fork('agents'),
         server: this._server,
-        io: { path: '/agents' }
+        io: { path: '/agents' },
       }),
       consoles: new SocketServer({
         log: this.log.fork('consoles'),
         server: this._server,
-        io: { path: '/consoles' }
-      })
+        io: { path: '/consoles' },
+      }),
     };
 
     if (options.parent) {
@@ -113,7 +113,7 @@ export class App {
         log: this.log.fork('parent'),
         url: options.parent,
         name: options.name,
-        options: { path: '/agents' }
+        options: { path: '/agents' },
       });
 
       this._sockets.parent.on('connect', () => {
@@ -123,7 +123,7 @@ export class App {
       setTimeout(() => {
         this._sockets.parent?.emit('state', {
           ...this.state.value,
-          agents: Object.values(this.state.value.agents)
+          agents: Object.values(this.state.value.agents),
         });
       }, 1000);
     }
@@ -134,10 +134,10 @@ export class App {
       this.state.next(state);
     });
 
-    this.state.subscribe(state => {
+    this.state.subscribe((state) => {
       this._sockets.parent?.emit('state', {
         ...state,
-        agents: Object.values(state.agents)
+        agents: Object.values(state.agents),
       });
     });
 
@@ -153,7 +153,7 @@ export class App {
   protected onHealth(_: express.Request, res: express.Response) {
     res.json({
       ...this.state.value,
-      agents: Object.values(this.state.value.agents)
+      agents: Object.values(this.state.value.agents),
     });
   }
 
@@ -165,7 +165,7 @@ export class App {
       functions,
       input: {
         role: 'user',
-        content: event.content
+        content: event.content,
       },
       body: {
         temperature: 0,
@@ -174,34 +174,36 @@ export class App {
         messages: [
           {
             role: 'system',
-            content: this.options.prompt
-          }
+            content: this.options.prompt,
+          },
         ],
-      }
+      },
     });
 
     this._sockets.parent?.emit(`message.${event.id}`, {
       $meta: {
         ...res.$meta,
-        $elapse: new Date().getTime() - start.getTime()
+        $elapse: new Date().getTime() - start.getTime(),
       },
       id: event.id,
-      content: res.message.content
+      content: res.message.content,
     });
   }
 
   protected onConsoleConnect({ socket }: { socket: io.Socket }) {
-    this._messages[socket.id] = [{
-      role: 'system',
-      content: this.options.prompt
-    }];
+    this._messages[socket.id] = [
+      {
+        role: 'system',
+        content: this.options.prompt,
+      },
+    ];
   }
 
   protected onConsoleDisconnect({ socket }: { socket: io.Socket }) {
     delete this._messages[socket.id];
   }
 
-  protected async onConsoleMessage({ socket, event }: { socket: io.Socket; event: MessageEvent; }) {
+  protected async onConsoleMessage({ socket, event }: { socket: io.Socket; event: MessageEvent }) {
     const start = new Date();
     const id = uuid.v4();
     const functions = this.functions;
@@ -210,7 +212,7 @@ export class App {
       functions,
       input: {
         role: 'user',
-        content: event.content
+        content: event.content,
       },
       body: {
         temperature: 0,
@@ -221,19 +223,19 @@ export class App {
       onChunk: (chunk) => {
         socket.emit(`message.${event.id}.chunk`, {
           id: id,
-          content: chunk.content
+          content: chunk.content,
         });
-      }
+      },
     });
 
     this._messages[socket.id].push(res.message);
     socket.emit(`message.${event.id}`, {
       $meta: {
         ...res.$meta,
-        $elapse: new Date().getTime() - start.getTime()
+        $elapse: new Date().getTime() - start.getTime(),
       },
       id: id,
-      content: res.message.content
+      content: res.message.content,
     });
   }
 

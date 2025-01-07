@@ -33,12 +33,12 @@ export class ChatModel {
   }
 
   async send(params: ChatModelSendParams): Promise<ChatModelSendResponse> {
-    let $meta: Record<string, any> = { };
+    let $meta: Record<string, any> = {};
     params.body.messages.push(params.input);
 
     if (params.input.role === 'assistant' && params.input.tool_calls?.length) {
       for (const call of params.input.tool_calls) {
-        const fn = (params.functions || { })[call.function.name];
+        const fn = (params.functions || {})[call.function.name];
 
         if (!fn) {
           throw new Error(`function ${call.function.name} not found`);
@@ -47,42 +47,45 @@ export class ChatModel {
         const start = new Date();
         const res = await fn.callback({
           ...JSON.parse(call.function.arguments),
-          id: params.id
+          id: params.id,
         });
 
         const elapse = new Date().getTime() - start.getTime();
         $meta[call.function.name] = {
           $elapse: elapse,
-          ...res.$meta
+          ...res.$meta,
         };
 
         params.body.messages.push({
           role: 'tool',
           content: res.content,
-          tool_call_id: call.id
+          tool_call_id: call.id,
         });
       }
     }
 
-    const tools = Object.entries(params.functions || { }).map(([name, value]) => ({
-      type: 'function',
-      function: {
-        name,
-        description: value.description,
-        parameters: value.parameters || { },
-        strict: true
-      }
-    } as OpenAI.Chat.Completions.ChatCompletionTool));
+    const tools = Object.entries(params.functions || {}).map(
+      ([name, value]) =>
+        ({
+          type: 'function',
+          function: {
+            name,
+            description: value.description,
+            parameters: value.parameters || {},
+            strict: true,
+          },
+        }) as OpenAI.Chat.Completions.ChatCompletionTool
+    );
 
     const res = await this._client.chat.completions.create({
       ...params.body,
-      tools: tools.length > 0 ? tools : undefined
+      tools: tools.length > 0 ? tools : undefined,
     });
 
     let message: OpenAI.Chat.ChatCompletionMessage = {
       role: 'assistant',
       content: '',
-      refusal: null
+      refusal: null,
     };
 
     if (!(res instanceof Stream)) {
@@ -104,8 +107,8 @@ export class ChatModel {
                   type: 'function',
                   function: {
                     name: '',
-                    arguments: ''
-                  }
+                    arguments: '',
+                  },
                 });
               }
 
@@ -145,7 +148,7 @@ export class ChatModel {
 
       return {
         $meta: { ...$meta, ...res.$meta },
-        message: res.message
+        message: res.message,
       };
     }
 

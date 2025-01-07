@@ -3,11 +3,13 @@ import mousetrap from 'mousetrap';
 
 @Directive({
   selector: '[agHotKey]',
-  standalone: false
+  standalone: false,
 })
 export class HotKey {
   @Input()
-  get agHotKey() { return this._agHotKey; }
+  get agHotKey() {
+    return this._agHotKey;
+  }
   set agHotKey(v) {
     if (this._agHotKey) {
       this._mousetrap.unbind(this._agHotKey);
