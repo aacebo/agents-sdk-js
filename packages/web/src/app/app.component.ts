@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@
 import { RouterOutlet } from '@angular/router';
 
 import { AppService } from './app.service';
-import { AppSocket } from './app.socket';
 import { AppState } from './app.state';
 
 @Component({
@@ -19,7 +18,6 @@ export class App implements OnInit {
   constructor(
     private readonly _app: AppService,
     private readonly _state: AppState,
-    private readonly _socket: AppSocket
   ) {}
 
   async ngOnInit() {
